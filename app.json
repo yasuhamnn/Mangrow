@@ -1,8 +1,8 @@
 {
   "expo": {
-    "scheme": "kidneycare",
-    "name": "KidneyCare",
-    "slug": "KidneyCare",
+    "scheme": "mangrow",
+    "name": "Mangrow",
+    "slug": "Mangrow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
