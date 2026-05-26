@@ -1,19 +1,57 @@
 import {
+  Alert,
+  Dimensions,
+  Image,
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Image,
-  Dimensions,
+  View,
 } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Link } from 'expo-router'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../firebaseConfig'
 
 const { width } = Dimensions.get('window')
 
 const Forgot_Password = () => {
+  const [email, setEmail] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleResetPassword = async () => {
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail) {
+      setErrorMessage('Enter the email address for your account.')
+      return
+    }
+
+    setErrorMessage('')
+    setIsSending(true)
+
+    try {
+      await sendPasswordResetEmail(auth, trimmedEmail)
+      Alert.alert(
+        'Check your inbox',
+        'If an account exists for that email, a password reset link has been sent.'
+      )
+      setEmail('')
+    } catch (error) {
+      if (error?.code === 'auth/invalid-email') {
+        setErrorMessage('Enter a valid email address.')
+      } else {
+        setErrorMessage(
+          error?.message ?? 'Unable to send the reset email right now.'
+        )
+      }
+    } finally {
+      setIsSending(false)
+    }
+  }
+
   return (
     <LinearGradient
       colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
@@ -40,11 +78,23 @@ const Forgot_Password = () => {
           placeholder="you@example.com"
           style={styles.input}
           keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
           placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
         />
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Send Reset Link →</Text>
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.button, isSending && styles.buttonDisabled]}
+          onPress={handleResetPassword}
+          disabled={isSending}
+        >
+          <Text style={styles.buttonText}>
+            {isSending ? 'Sending...' : 'Send Reset Link →'}
+          </Text>
         </TouchableOpacity>
 
         <Link href="/Sign_In" asChild>
@@ -118,12 +168,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
 
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+
   button: {
     backgroundColor: '#0F766E',
     padding: 15,
     borderRadius: 15,
     alignItems: 'center',
     marginTop: 10,
+  },
+
+  buttonDisabled: {
+    opacity: 0.7,
   },
 
   buttonText: {

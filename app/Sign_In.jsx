@@ -10,7 +10,13 @@ import {
 import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebaseConfig'
+import { loginOffline } from '../offlineAuth'
+import { isOnline } from '../network'
+import { db } from '../firebaseConfig'
+import { doc, getDoc } from 'firebase/firestore'
 
 const { width } = Dimensions.get('window')
 
@@ -18,7 +24,75 @@ const Sign_In = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const router = useRouter()
 
+  const handleLogin = async () => {
+    setErrorMessage('')
+  
+    const online = await isOnline()
+  
+    try {
+      if (online) {
+        const userCredential =
+          await signInWithEmailAndPassword(
+            auth,
+            email.trim(),
+            password
+          )
+  
+        const uid = userCredential.user.uid
+  
+        // GET USER ROLE FROM FIRESTORE
+        const userDoc = await getDoc(
+          doc(db, 'users', uid)
+        )
+  
+        if (!userDoc.exists()) {
+          setErrorMessage('User record not found.')
+          return
+        }
+  
+        const userData = userDoc.data()
+  
+        // ROLE-BASED REDIRECT
+        if (userData.role === 'admin') {
+          router.replace('/admin/admin_dashboard')
+        } else {
+          router.replace('/dashboard')
+        }
+  
+      } else {
+        // OFFLINE LOGIN (DEFAULT VOLUNTEER ACCESS)
+        await loginOffline(email.trim(), password)
+  
+        router.replace('/dashboard')
+      }
+  
+    } catch (error) {
+      const authErrorCodes = [
+        'auth/invalid-credential',
+        'auth/wrong-password',
+        'auth/user-not-found',
+        'auth/invalid-email',
+      ]
+  
+      const offlineAuthErrors = [
+        'Invalid offline credentials',
+      ]
+  
+      if (
+        authErrorCodes.includes(error?.code) ||
+        offlineAuthErrors.includes(error?.message)
+      ) {
+        setErrorMessage('Incorrect email or password.')
+      } else {
+        setErrorMessage(error?.message ?? 'Unable to sign in.')
+      }
+    }
+  }
   return (
     <LinearGradient
       colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
@@ -35,9 +109,7 @@ const Sign_In = () => {
       </View>
 
       <Text style={styles.title}>Welcome to Mangrow</Text>
-      <Text style={styles.subtitle}>
-      Monitor mangroves, protect coastlines
-      </Text>
+      <Text style={styles.subtitle}>Monitor mangroves, protect coastlines</Text>
 
       <View style={styles.card}>
         <View style={styles.tabContainer}>
@@ -52,14 +124,22 @@ const Sign_In = () => {
           </Link>
         </View>
 
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+
         <Text style={styles.label}>Email Address</Text>
         <TextInput
           placeholder="you@example.com"
           style={[styles.input, emailFocused && styles.inputFocused]}
           keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
           placeholderTextColor="#7A8593"
           onFocus={() => setEmailFocused(true)}
           onBlur={() => setEmailFocused(false)}
+          onChangeText={setEmail}
+          value={email}
         />
 
         <Text style={styles.label}>Password</Text>
@@ -77,6 +157,8 @@ const Sign_In = () => {
             placeholderTextColor="#7A8593"
             onFocus={() => setPasswordFocused(true)}
             onBlur={() => setPasswordFocused(false)}
+            onChangeText={setPassword}
+            value={password}
           />
 
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -103,7 +185,7 @@ const Sign_In = () => {
           </Link>
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Sign In →</Text>
         </TouchableOpacity>
       </View>
@@ -261,6 +343,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     marginTop: 20,
+  },
+
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 12,
   },
 
   buttonText: {

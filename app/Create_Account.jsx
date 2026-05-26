@@ -6,20 +6,76 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  Alert,
 } from 'react-native'
 import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '../firebaseConfig'
+import { saveUserOffline } from '../offlineAuth'
+import { isOnline } from '../network'
+import { db } from '../firebaseConfig'
+import { doc, setDoc, serverTimestamp,} from 'firebase/firestore'
 
 const { width } = Dimensions.get('window')
 
 const Create_Account = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [fullNameFocused, setFullNameFocused] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const router = useRouter()
 
+
+  const handleCreateAccount = async () => {
+    if (!fullName.trim() || !email.trim() || !password) {
+      Alert.alert('Missing information', 'Please fill in all fields.')
+      return
+    }
+  
+    const online = await isOnline()
+  
+    try {
+      if (online) {
+        const credential = await createUserWithEmailAndPassword(
+          auth,
+          email.trim(),
+          password
+        )
+  
+        await updateProfile(credential.user, {
+          displayName: fullName.trim(),
+        })
+  
+        // SAVE USER TO FIRESTORE
+        await setDoc(doc(db, 'users', credential.user.uid), {
+          uid: credential.user.uid,
+          fullName: fullName.trim(),
+          email: email.trim(),
+          role: 'volunteer', // DEFAULT ROLE
+          createdAt: serverTimestamp(),
+        })
+  
+        Alert.alert('Success', 'Account created successfully.')
+  
+        router.push('/Sign_In')
+      } else {
+        await saveUserOffline(email.trim(), password, fullName.trim())
+  
+        Alert.alert(
+          'Offline',
+          'Saved offline. Will sync later.'
+        )
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    }
+  }
   return (
     <LinearGradient
       colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
@@ -56,6 +112,8 @@ const Create_Account = () => {
           placeholder="John Doe"
           style={[styles.input, fullNameFocused && styles.inputFocused]}
           placeholderTextColor="#7A8593"
+          value={fullName}
+          onChangeText={setFullName}
           onFocus={() => setFullNameFocused(true)}
           onBlur={() => setFullNameFocused(false)}
         />
@@ -66,6 +124,8 @@ const Create_Account = () => {
           style={[styles.input, emailFocused && styles.inputFocused]}
           keyboardType="email-address"
           placeholderTextColor="#7A8593"
+          value={email}
+          onChangeText={setEmail}
           onFocus={() => setEmailFocused(true)}
           onBlur={() => setEmailFocused(false)}
         />
@@ -83,6 +143,8 @@ const Create_Account = () => {
             style={styles.passwordInput}
             secureTextEntry={!showPassword}
             placeholderTextColor="#7A8593"
+            value={password}
+            onChangeText={setPassword}
             onFocus={() => setPasswordFocused(true)}
             onBlur={() => setPasswordFocused(false)}
           />
@@ -97,15 +159,15 @@ const Create_Account = () => {
         </View>
 
         <View style={styles.topPrompt}>
-        <Text style={styles.topPromptText}>Already have an account? </Text>
-        <Link href="/Sign_In" asChild>
-          <TouchableOpacity>
-            <Text style={styles.topPromptLink}>Sign In</Text>
-          </TouchableOpacity>
-        </Link>
-      </View>
+          <Text style={styles.topPromptText}>Already have an account? </Text>
+          <Link href="/Sign_In" asChild>
+            <TouchableOpacity>
+              <Text style={styles.topPromptLink}>Sign In</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
           <Text style={styles.buttonText}>Create Account →</Text>
         </TouchableOpacity>
       </View>
