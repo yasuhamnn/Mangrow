@@ -8,7 +8,6 @@ import {
   Dimensions,
 } from 'react-native'
 import React, { useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
 import { signInWithEmailAndPassword } from 'firebase/auth'
@@ -17,8 +16,16 @@ import { loginOffline } from '../offlineAuth'
 import { isOnline } from '../network'
 import { db } from '../firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore'
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+} from '@expo-google-fonts/montserrat'
+import AuthBackground from './components/AuthBackground'
 
 const { width } = Dimensions.get('window')
+
 
 const Sign_In = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -28,6 +35,17 @@ const Sign_In = () => {
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
+
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+  })
+  
+  if (!fontsLoaded) {
+    return null
+  }
+  
 
   const handleLogin = async () => {
     setErrorMessage('')
@@ -94,20 +112,7 @@ const Sign_In = () => {
     }
   }
   return (
-    <LinearGradient
-      colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      <View style={styles.logoContainer}>
-        <Image
-          source={require('../assets/app_logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
+    <AuthBackground style={styles.container}>
       <Text style={styles.title}>Welcome to Mangrow</Text>
       <Text style={styles.subtitle}>Monitor mangroves, protect coastlines</Text>
 
@@ -178,6 +183,7 @@ const Sign_In = () => {
 
         <View style={styles.bottomPrompt}>
           <Text style={styles.bottomPromptText}>Don't have an account? </Text>
+          
           <Link href="/Create_Account" asChild>
             <TouchableOpacity>
               <Text style={styles.bottomPromptLink}>Create Account</Text>
@@ -189,7 +195,7 @@ const Sign_In = () => {
           <Text style={styles.buttonText}>Sign In →</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </AuthBackground>
   )
 }
 
@@ -199,26 +205,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
-  },
-
-  logoContainer: {
-    marginTop: 40,
-    marginBottom: -20,
-  },
-
-  logo: {
-    width: 110,
-    height: 110,
+    paddingTop: 150,
+    backgroundColor: 'rgba(255, 255, 255, 0.69)',
   },
 
   title: {
     fontSize: width * 0.06,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     color: '#111827',
-    marginTop: -10,
-  },
 
+  },
   subtitle: {
     fontSize: width * 0.035,
     color: '#6B7280',
@@ -226,8 +222,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#FFFFFF',
-    opacity: 0.95,
     borderRadius: 20,
     padding: 20,
     paddingBottom: 28,
@@ -264,13 +258,14 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     color: '#111827',
   },
 
   inactiveText: {
     color: '#6B7280',
-    fontWeight: '600',
+    fontFamily: 'Montserrat_600SemiBold',
+
   },
 
   label: {
@@ -278,6 +273,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     color: '#374151',
+    fontFamily: 'Montserrat_600SemiBold',
   },
 
   input: {
@@ -290,7 +286,7 @@ const styles = StyleSheet.create({
   },
 
   inputFocused: {
-    borderColor: '#0F766E',
+    borderColor: '#6daa1a',
   },
 
   passwordContainer: {
@@ -315,8 +311,9 @@ const styles = StyleSheet.create({
   },
 
   forgotLinkText: {
-    color: '#0F766E',
-    fontWeight: '600',
+    color: '#437105',
+    
+    fontWeight: '700',
   },
 
   bottomPrompt: {
@@ -332,13 +329,13 @@ const styles = StyleSheet.create({
   },
 
   bottomPromptLink: {
-    color: '#0F766E',
+    color: '#437105',
     fontSize: 14,
     fontWeight: '700',
   },
 
   button: {
-    backgroundColor: '#0F766E',
+    backgroundColor: '#6daa1a',
     padding: 15,
     borderRadius: 15,
     alignItems: 'center',
@@ -354,8 +351,8 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: '#ffffff',
     fontSize: 16,
+    fontFamily: 'Montserrat_700Bold',
   },
 })

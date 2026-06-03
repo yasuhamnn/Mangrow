@@ -9,10 +9,16 @@ import {
   View,
 } from 'react-native'
 import React, { useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Link } from 'expo-router'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '../firebaseConfig'
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+} from '@expo-google-fonts/montserrat'
+import AuthBackground from './components/AuthBackground'
 
 const { width } = Dimensions.get('window')
 
@@ -20,6 +26,16 @@ const Forgot_Password = () => {
   const [email, setEmail] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+  })
+
+  if (!fontsLoaded) {
+    return null
+  }
 
   const handleResetPassword = async () => {
     const trimmedEmail = email.trim()
@@ -42,6 +58,8 @@ const Forgot_Password = () => {
     } catch (error) {
       if (error?.code === 'auth/invalid-email') {
         setErrorMessage('Enter a valid email address.')
+      } else if (error?.code === 'auth/user-not-found') {
+        setErrorMessage('No account exists with this email.')
       } else {
         setErrorMessage(
           error?.message ?? 'Unable to send the reset email right now.'
@@ -53,26 +71,17 @@ const Forgot_Password = () => {
   }
 
   return (
-    <LinearGradient
-      colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      <View style={styles.logoContainer}>
-        <Image
-          source={require('../assets/app_logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
-      <Text style={styles.title}>Recover Your Account</Text>
+    <AuthBackground style={styles.container}>
+      <Text style={styles.title}>Welcome to Mangrow</Text>
       <Text style={styles.subtitle}>
-        Enter your email and we’ll send a password reset link.
+        Monitor mangroves, protect coastlines
       </Text>
 
       <View style={styles.card}>
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+
         <Text style={styles.label}>Email Address</Text>
         <TextInput
           placeholder="you@example.com"
@@ -80,12 +89,20 @@ const Forgot_Password = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#7A8593"
           value={email}
           onChangeText={setEmail}
         />
 
-        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+        {/* Inline prompt + link matching UI used on Sign In / Create Account */}
+        <View style={styles.inlinePrompt}>
+          <Text style={styles.bottomPromptText}>Remember your password?</Text>
+          <Link href="/Sign_In" asChild>
+            <TouchableOpacity>
+              <Text style={styles.backLinkText}> Sign In</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
 
         <TouchableOpacity
           style={[styles.button, isSending && styles.buttonDisabled]}
@@ -93,17 +110,12 @@ const Forgot_Password = () => {
           disabled={isSending}
         >
           <Text style={styles.buttonText}>
-            {isSending ? 'Sending...' : 'Send Reset Link →'}
+            {isSending ? 'Sending...' : 'Send Link →'}
           </Text>
         </TouchableOpacity>
 
-        <Link href="/Sign_In" asChild>
-          <TouchableOpacity style={styles.backLink}>
-            <Text style={styles.backLinkText}>Back to Sign In</Text>
-          </TouchableOpacity>
-        </Link>
       </View>
-    </LinearGradient>
+    </AuthBackground>
   )
 }
 
@@ -113,24 +125,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 150,
+    backgroundColor: 'rgba(255, 255, 255, 0.69)',
   },
-
-  logoContainer: {
-    marginTop: 40,
-    marginBottom: -20,
-  },
-
-  logo: {
-    width: 110,
-    height: 110,
-  },
-
   title: {
     fontSize: width * 0.06,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     color: '#111827',
-    marginTop: -10,
     textAlign: 'center',
   },
 
@@ -143,7 +144,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#FFFFFF',
     opacity: 0.95,
     borderRadius: 20,
     padding: 20,
@@ -157,15 +157,28 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     color: '#374151',
+    fontFamily: 'Montserrat_600SemiBold',
   },
 
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#D1D5DB',
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
     backgroundColor: '#F9FAFB',
+  },
+
+  inlinePrompt: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 35,
+  },
+
+  bottomPromptText: {
+    color: '#374151',
+    fontSize: 14,
   },
 
   errorText: {
@@ -177,11 +190,11 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#0F766E',
+    backgroundColor: '#6daa1a',
     padding: 15,
     borderRadius: 15,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
   },
 
   buttonDisabled: {
@@ -190,17 +203,18 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     fontSize: 16,
   },
 
   backLink: {
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 30,
   },
 
   backLinkText: {
-    color: '#0F766E',
-    fontWeight: '600',
+    color: '#437105',
+    fontSize: 14,
+    fontWeight: '700',
   },
 })

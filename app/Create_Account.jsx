@@ -9,7 +9,6 @@ import {
   Alert,
 } from 'react-native'
 import React, { useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
@@ -18,6 +17,13 @@ import { saveUserOffline } from '../offlineAuth'
 import { isOnline } from '../network'
 import { db } from '../firebaseConfig'
 import { doc, setDoc, serverTimestamp,} from 'firebase/firestore'
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+} from '@expo-google-fonts/montserrat'
+import AuthBackground from './components/AuthBackground'
 
 const { width } = Dimensions.get('window')
 
@@ -26,18 +32,31 @@ const Create_Account = () => {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [fullNameFocused, setFullNameFocused] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
   const router = useRouter()
 
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+  })
+  
+  if (!fontsLoaded) {
+    return null
+  }
+
 
   const handleCreateAccount = async () => {
+    setErrorMessage('')
+
     if (!fullName.trim() || !email.trim() || !password) {
-      Alert.alert('Missing information', 'Please fill in all fields.')
+      setErrorMessage('Please fill in all fields.')
       return
     }
-  
+
     const online = await isOnline()
   
     try {
@@ -73,23 +92,19 @@ const Create_Account = () => {
         )
       }
     } catch (error) {
-      Alert.alert('Error', error.message)
+      if (error?.code === 'auth/email-already-in-use') {
+        setErrorMessage('This email is already in use.')
+      } else if (error?.code === 'auth/invalid-email') {
+        setErrorMessage('Please enter a valid email address.')
+      } else if (error?.code === 'auth/weak-password') {
+        setErrorMessage('Password is too weak (min 6 characters).')
+      } else {
+        setErrorMessage(error?.message ?? 'Unable to create account.')
+      }
     }
   }
   return (
-    <LinearGradient
-      colors={['#7FD4FF', '#B4F3D8', '#77E8C5']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      <View style={styles.logoContainer}>
-        <Image
-          source={require('../assets/app_logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+    <AuthBackground style={styles.container}>
 
       <Text style={styles.title}>Welcome to Mangrow</Text>
       <Text style={styles.subtitle}>Monitor mangroves, protect coastlines</Text>
@@ -106,6 +121,10 @@ const Create_Account = () => {
             <Text style={styles.activeText}>Create Account</Text>
           </View>
         </View>
+
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
         <Text style={styles.label}>Full Name</Text>
         <TextInput
@@ -171,7 +190,7 @@ const Create_Account = () => {
           <Text style={styles.buttonText}>Create Account →</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </AuthBackground>
   )
 }
 
@@ -181,24 +200,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
-  },
-
-  logoContainer: {
-    marginTop: 40,
-    marginBottom: -20,
-  },
-
-  logo: {
-    width: 110,
-    height: 110,
+    paddingTop: 150,
+    backgroundColor: 'rgba(255, 255, 255, 0.69)',
   },
 
   title: {
     fontSize: width * 0.06,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     color: '#111827',
-    marginTop: -10,
   },
 
   subtitle: {
@@ -220,14 +229,12 @@ const styles = StyleSheet.create({
   },
 
   topPromptLink: {
-    color: '#0F766E',
+    color: '#437105',
     fontSize: 14,
     fontWeight: '700',
   },
 
   card: {
-    backgroundColor: '#FFFFFF',
-    opacity: 0.95,
     borderRadius: 20,
     paddingTop: 20,
     paddingHorizontal: 20,
@@ -265,13 +272,13 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     color: '#111827',
   },
 
   inactiveText: {
     color: '#6B7280',
-    fontWeight: '600',
+    fontFamily: 'Montserrat_600SemiBold',
   },
 
   label: {
@@ -279,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 14,
     color: '#374151',
-    fontWeight: '500',
+    fontFamily: 'Montserrat_600SemiBold',
   },
 
   input: {
@@ -292,7 +299,7 @@ const styles = StyleSheet.create({
   },
 
   inputFocused: {
-    borderColor: '#0F766E',
+    borderColor: '#6daa1a',
   },
 
   passwordContainer: {
@@ -312,7 +319,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#0F766E',
+    backgroundColor: '#6daa1a',
     padding: 15,
     borderRadius: 15,
     alignItems: 'center',
@@ -321,7 +328,15 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
     fontSize: 16,
+  },
+
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 })
