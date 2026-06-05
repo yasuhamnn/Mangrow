@@ -240,8 +240,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 30,
     width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
   },
 
   tabContainer: {

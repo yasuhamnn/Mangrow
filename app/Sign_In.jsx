@@ -226,8 +226,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 28,
     width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
   },
 
   tabContainer: {
@@ -244,11 +242,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
   },
 
   inactiveTab: {

@@ -148,8 +148,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
   },
 
   label: {

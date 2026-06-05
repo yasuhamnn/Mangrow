@@ -5,14 +5,14 @@
     "slug": "Mangrow",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app_logo.png",
+    "icon": "./assets/app_logos.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
 
     "splash": {
-      "image": "./assets/app_logo.png",
+      "image": "./assets/app_logos.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#CFEFC7"
     },
 
     "ios": {
@@ -21,14 +21,14 @@
 
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app_logo.png",
+        "foregroundImage": "./assets/app_logos.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
 
     "web": {
-      "favicon": "./assets/app_logo.png"
+      "favicon": "./assets/app_logos.png"
     },
 
     "plugins": [

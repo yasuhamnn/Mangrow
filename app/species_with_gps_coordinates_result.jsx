@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import {
@@ -8,23 +8,6 @@ import {
   Montserrat_600SemiBold,
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat'
-
-function formatValue(value) {
-  if (!value) {
-    return 'N/A'
-  }
-
-  return Array.isArray(value) ? value.join(', ') : String(value)
-}
-
-function DetailRow({ label, value }) {
-  return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{formatValue(value)}</Text>
-    </View>
-  )
-}
 
 export default function SpeciesWithGpsCoordinatesResult() {
   const router = useRouter()
@@ -36,136 +19,307 @@ export default function SpeciesWithGpsCoordinatesResult() {
     Montserrat_700Bold,
   })
 
-  if (!fontsLoaded) {
-    return null
-  }
+  if (!fontsLoaded) return null
+
+  const readableLocation = [
+    params.barangay,
+    params.city,
+    params.region,
+  ].filter(Boolean).join(', ')
+
+  const formattedDate = params.timestamp
+    ? new Date(params.timestamp).toLocaleString()
+    : 'Unknown Date'
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Captured Image */}
+        <View style={styles.imageCard}>
+          {params.imageUri ? (
+            <Image source={{ uri: params.imageUri }} style={styles.image} />
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <Ionicons name="image-outline" size={50} color="#9CA3AF" />
+            </View>
+          )}
+        </View>
+
+        {/* Species Info */}
         <View style={styles.card}>
-          <View style={styles.iconWrap}>
-            <Ionicons name="location" size={30} color="#2F7D32" />
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>AI SPECIES IDENTIFICATION</Text>
           </View>
 
-          <Text style={styles.title}>Geo-tagged capture saved</Text>
-          <Text style={styles.subtitle}>
-            Use these coordinates and address details for debugging and field verification.
+          <Text style={styles.speciesName}>{params.speciesName || ''}</Text>
+
+          <Text style={styles.description}>{params.description || ''}</Text>
+
+          <Text style={styles.disclaimer}>
+            Species identification will appear here once the AI model is implemented.
           </Text>
+        </View>
 
-          <View style={styles.detailsCard}>
-            <DetailRow label="Latitude" value={params.latitude} />
-            <DetailRow label="Longitude" value={params.longitude} />
-            <DetailRow label="Timestamp" value={params.timestamp} />
-            <DetailRow label="Street" value={params.street} />
-            <DetailRow label="Purok" value={params.purok} />
-            <DetailRow label="Barangay" value={params.barangay} />
-            <DetailRow label="City / Municipality" value={params.city} />
-            <DetailRow label="District" value={params.district} />
-            <DetailRow label="Province / Region" value={params.region} />
-            <DetailRow label="Country" value={params.country} />
-            <DetailRow label="Formatted Address" value={params.formattedAddress} />
+        {/* Location & GPS */}
+        <View style={styles.locationCard}>
+          <View style={styles.locationHeaderRow}>
+            <View style={styles.iconCircle}>
+              <Ionicons name="location" size={20} color="#6daa1a" />
+            </View>
+            <View style={styles.locationTextColumn}>
+              <Text style={styles.locationLabel}>LOCATION</Text>
+              <Text style={styles.locationTitle}>{readableLocation || 'Detecting Location...'}</Text>
+              <Text style={styles.locationSub}>{params.country || 'Unknown Region'}</Text>
+            </View>
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-            <Text style={styles.buttonText}>Back to Camera</Text>
-          </TouchableOpacity>
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <Ionicons name="navigate-circle" size={20} color="#6daa1a" />
+            <View style={styles.textContainer}>
+              <Text style={styles.miniLabel}>GPS COORDINATES</Text>
+              <Text style={styles.infoText}>{params.latitude || '0.000000'}, {params.longitude || '0.000000'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Ionicons name="time-outline" size={20} color="#6daa1a" />
+            <View style={styles.textContainer}>
+              <Text style={styles.miniLabel}>CAPTURE TIMESTAMP</Text>
+              <Text style={styles.infoText}>{formattedDate}</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
+
+      {/* Floating Header Overlay (exactly like camera.jsx) */}
+      <SafeAreaView style={styles.headerOverlay} pointerEvents="box-none">
+        <View style={styles.topOverlay}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="chevron-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+
+      {/* Fixed Action Button Dock */}
+      <View style={styles.buttonDock}>
+        <TouchableOpacity style={styles.primaryButton} onPress={() => {}}>
+          <Ionicons name="heart-circle-outline" size={22} color="#FFFFFF" />
+          <Text style={styles.primaryButtonText}>Check Health Status</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3F7EF',
+  container: { 
+    flex: 1, 
+    backgroundColor: '#FBFCF7' 
   },
-  content: {
-    flexGrow: 1,
-    padding: 18,
-    justifyContent: 'center',
+  
+  content: { 
+    padding: 16, 
+    paddingBottom: 30 ,
+    paddingTop: 24,
   },
-  card: {
-    backgroundColor: '#FFFFFF',
+
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  topOverlay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 22,
+    paddingTop: 35,
+    backgroundColor: 'transparent',
+  },
+
+  backButton: {
+    width: 44,
+    height: 44,
     borderRadius: 22,
-    borderWidth: 2,
-    borderColor: '#151515',
-    padding: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 4, height: 4 },
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  iconWrap: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#151515',
-    backgroundColor: '#DDF0C9',
-    alignItems: 'center',
+    backgroundColor: 'rgba(21, 30, 28, 0.72)',
     justifyContent: 'center',
-    marginBottom: 14,
-  },
-  title: {
-    fontSize: 24,
-    lineHeight: 28,
-    fontFamily: 'Montserrat_700Bold',
-    color: '#111827',
-  },
-  subtitle: {
-    marginTop: 8,
-    marginBottom: 16,
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: 'Montserrat_400Regular',
-    color: '#374151',
-  },
-  detailsCard: {
-    backgroundColor: '#FBFCF7',
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: '#151515',
-    padding: 14,
-  },
-  detailRow: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#D7E2CE',
-  },
-  detailLabel: {
-    fontSize: 12,
-    fontFamily: 'Montserrat_700Bold',
-    color: '#2F3B2C',
-    marginBottom: 3,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  detailValue: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: 'Montserrat_400Regular',
-    color: '#111827',
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: '#6daa1a',
-    borderWidth: 2,
-    borderColor: '#151515',
-    borderRadius: 16,
-    paddingVertical: 14,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 4, height: 4 },
-    shadowRadius: 0,
-    elevation: 3,
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  
+  imageCard: { 
+    borderRadius: 22, 
+    overflow: 'hidden', 
+    backgroundColor: '#FFFFFF', 
+    marginBottom: 16 
+  },
+  
+  image: { 
+    width: '100%', 
+    height: 260 
+  },
+  
+  imagePlaceholder: { 
+    height: 260, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    backgroundColor: '#F3F4F6' 
+  },
+
+  card: { 
+    backgroundColor: '#FFFFFF', 
+    borderRadius: 20, 
+    padding: 18, 
+    marginBottom: 16 
+  },
+
+  badge: { 
+    alignSelf: 'flex-start', 
+    backgroundColor: '#CFEFC7', 
+    paddingHorizontal: 10, 
+    paddingVertical: 5, 
+    borderRadius: 12, 
+    marginBottom: 12 
+  },
+
+  badgeText: { 
+    fontSize: 11, 
+    color: '#2E8F2C', 
+    fontFamily: 'Montserrat_700Bold' 
+  },
+  
+  speciesName: { 
+    fontSize: 30, 
+    lineHeight: 38, 
+    color: '#10200F', 
     fontFamily: 'Montserrat_700Bold',
+     marginBottom: 10 
+    },
+
+  description: { 
+    fontSize: 16, 
+    lineHeight: 28, 
+    color: '#4B5563', 
+    fontFamily: 'Montserrat_400Regular' 
   },
+
+  disclaimer: { 
+    marginTop: 20, 
+    fontSize: 13, 
+    lineHeight: 20, 
+    color: '#9CA3AF', 
+    fontStyle: 'italic' 
+  },
+
+  locationCard: { 
+    backgroundColor: '#FFFFFF', 
+    borderRadius: 20, 
+    padding: 20, 
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#E8ECDD',
+    shadowColor: '#A7B195',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
+  },
+
+  locationHeaderRow: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0F9E8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+
+  locationTextColumn: {
+    flex: 1,
+  },
+
+  locationLabel: {
+    fontSize: 10,
+    fontFamily: 'Montserrat_700Bold',
+    color: '#6daa1a',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+
+  locationTitle: { 
+    fontSize: 16, 
+    color: '#10200F', 
+    fontFamily: 'Montserrat_600SemiBold' 
+  },
+
+  locationSub: { 
+    fontSize: 12, 
+    color: '#6B7280', 
+    fontFamily: 'Montserrat_400Regular' 
+  },
+
+  infoRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 12,
+  },
+
+  textContainer: {
+    flex: 1,
+  },
+
+  miniLabel: {
+    fontSize: 9,
+    fontFamily: 'Montserrat_700Bold',
+    color: '#9CA3AF',
+    letterSpacing: 0.5,
+    marginBottom: 1,
+  },
+
+  infoText: { 
+    fontSize: 14, 
+    color: '#4B5563', 
+    fontFamily: 'Montserrat_400Regular' 
+  },
+
+  divider: { 
+    height: 1, 
+    backgroundColor: '#E5E7EB', 
+    marginVertical: 14 
+  },
+  
+  buttonDock: {
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    paddingBottom: 35,
+  },
+  
+  primaryButton: { 
+    height: 60, 
+    borderRadius: 16, 
+    backgroundColor: '#6daa1a', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    flexDirection: 'row' 
+  },
+
+  primaryButtonText: { 
+    marginLeft: 8, 
+    color: '#FFFFFF', 
+    fontSize: 14, 
+    fontFamily: 'Montserrat_700Bold' },
 })

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons'
@@ -50,6 +50,24 @@ function getFirstName(name) {
 export default function Dashboard() {
   const [greetingName, setGreetingName] = useState('Friend')
 
+  const fadeAnim = useRef(new Animated.Value(0)).current
+  const slideAnim = useRef(new Animated.Value(15)).current
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [])
+
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_600SemiBold,
@@ -81,85 +99,87 @@ export default function Dashboard() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.header}>
-          <View style={styles.brandWrap}>
-            <Text style={styles.brandText}>Mangrow</Text>
-          </View>
+      <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.content}
+        >
+          <View style={styles.header}>
+            <View style={styles.brandWrap}>
+              <Text style={styles.brandText}>Mangrow</Text>
+            </View>
 
-          <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85}>
-            <Feather name="settings" size={17} color="#304018" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.heroCard}>
-          <Image
-            source={require('../assets/app_logo.png')}
-            style={styles.heroLogo}
-          />
-          <View style={styles.heroContent}>
-            <Text style={styles.heroEyebrow}>
-              HI, {greetingName.toUpperCase()} 👋
-            </Text>
-            <Text style={styles.heroTitle}>Protect mangroves with us{'\n'}</Text>
-             <Text style={styles.subtitle}>
-                    Monitor mangroves, protect coastlines
-                  </Text>
-            <TouchableOpacity style={styles.submitBtn} activeOpacity={0.88}>
-              <Text style={styles.submitText}>Submit →</Text>
+            <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85}>
+              <Feather name="settings" size={17} color="#304018" />
             </TouchableOpacity>
           </View>
-        </View>
 
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>3</Text>
-            <Text style={styles.statLabel}>UNHEALTHY</Text>
+          <View style={styles.heroCard}>
+            <Image
+              source={require('../assets/app_logo.png')}
+              style={styles.heroLogo}
+            />
+            <View style={styles.heroContent}>
+              <Text style={styles.heroEyebrow}>
+                HI, {greetingName.toUpperCase()} 👋
+              </Text>
+              <Text style={styles.heroTitle}>Protect mangroves with us{'\n'}</Text>
+              <Text style={styles.subtitle}>
+                Monitor mangroves, protect coastlines
+              </Text>
+              <TouchableOpacity style={styles.submitBtn} activeOpacity={0.88}>
+                <Text style={styles.submitText}>Submit →</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>HEALTHY</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>3</Text>
+              <Text style={styles.statLabel}>UNHEALTHY</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statLabel}>HEALTHY</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>1</Text>
+              <Text style={styles.statLabel}>RESOLVED</Text>
+            </View>
           </View>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>1</Text>
-            <Text style={styles.statLabel}>RESOLVED</Text>
+          <Text style={styles.sectionTitle}>Quick Tools</Text>
+
+          <View style={styles.toolsGrid}>
+            {QUICK_TOOLS.map((tool) => (
+              <TouchableOpacity
+                key={tool.key}
+                style={styles.toolCard}
+                activeOpacity={0.88}
+              >
+                <View style={styles.toolIconWrap}>
+                  <Ionicons name={tool.icon} size={22} color="#2C8F2F" />
+                </View>
+                <Text style={styles.toolTitle}>{tool.title}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>Quick Tools</Text>
-
-        <View style={styles.toolsGrid}>
-          {QUICK_TOOLS.map((tool) => (
-            <TouchableOpacity
-              key={tool.key}
-              style={styles.toolCard}
-              activeOpacity={0.88}
-            >
-              <View style={styles.toolIconWrap}>
-                <Ionicons name={tool.icon} size={22} color="#2C8F2F" />
-              </View>
-              <Text style={styles.toolTitle}>{tool.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
 
       <View style={styles.bottomNavSafeArea} pointerEvents="none" />
 
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <Ionicons name="home" size={18} color="#3D5F18" />
+          <Feather name="home" size={18} color="#3D5F18" />
           <Text style={[styles.navText, styles.activeNavText]}>Home</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
           <View style={styles.navIconWrap}>
-            <MaterialIcons name="article" size={18} color="#B8BEB3" />
+            <Feather name="file-text" size={18} color="#B8BEB3" />
             <View style={styles.reportBadge}>
               <Ionicons name="add" size={8} color="#fff" />
             </View>
@@ -171,7 +191,7 @@ export default function Dashboard() {
           <TouchableOpacity style={styles.cameraWrapper} activeOpacity={0.86}>
             <View style={styles.cameraBackground}>
               <View style={styles.cameraButton}>
-                <Ionicons name="camera" size={20} color="#fff" />
+                <Ionicons name="camera-outline" size={20} color="#fff" />
               </View>
             </View>
           </TouchableOpacity>
@@ -179,13 +199,13 @@ export default function Dashboard() {
 
         <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
           <View style={styles.navIconWrap}>
-            <Ionicons name="notifications-outline" size={18} color="#B8BEB3" />
+            <Feather name="bell" size={18} color="#B8BEB3" />
           </View>
           <Text style={styles.navText}>Alert</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <Ionicons name="person-outline" size={18} color="#B8BEB3" />
+          <Feather name="user" size={18} color="#B8BEB3" />
           <Text style={styles.navText}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -258,13 +278,13 @@ const styles = StyleSheet.create({
     bottom: -40,
     width: 200,
     height: 170,
-    opacity: 0.45,
+    opacity: 1,
   },
 
   heroEyebrow: {
     fontSize: 12,
     fontFamily: 'Montserrat_600SemiBold',
-    color: '#2E8F2C',
+    color: '#437105',
     letterSpacing: 0.15,
   },
 
@@ -295,14 +315,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     marginTop: 10,
-    shadowColor: '#2D7F2B',
-    shadowOpacity: 0.16,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 2,
   },
 
   submitText: {
@@ -328,14 +340,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    shadowColor: '#A7B195',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 1,
   },
 
   statValue: {
@@ -382,15 +386,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 12,
     paddingBottom: 10,
-    shadowColor: '#A7B195',
     borderColor: '#E8ECDD',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 1,
     justifyContent: 'space-between',
   },
 
@@ -409,7 +405,7 @@ const styles = StyleSheet.create({
   toolTitle: {
     fontSize: 13,
     lineHeight: 15,
-    color: '#0F1B0F',
+    color: '#437105',
     fontFamily: 'Montserrat_600SemiBold',
     letterSpacing: -0.15,
     maxWidth: 90,
@@ -485,17 +481,9 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 22,
-    backgroundColor: '#75B900',
+    backgroundColor: '#3EAA2B',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#4C7A00',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
   },
 
   reportBadge: {
