@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     height: 46,
     borderTopLeftRadius: 44,
     borderBottomRightRadius: 44,
-    backgroundColor: '#63BF08',
+    backgroundColor: '#75C914',
     // shadow properties removed to eliminate the shadow
   },
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   leafThree: {
     top: 46,
     left: 4,
-    backgroundColor: '#4EAD05',
+    backgroundColor: '#CFEFC7',
   },
 
   vein: {

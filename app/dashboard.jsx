@@ -2,37 +2,36 @@ import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons'
+import { Ionicons, Feather } from '@expo/vector-icons'
 import { Link } from 'expo-router'
 import { auth } from '../firebaseConfig'
+import BottomNav from './components/BottomNav'
 import { getCurrentOfflineUser } from '../offlineAuth'
-import {
-  useFonts,
-  Montserrat_400Regular,
-  Montserrat_600SemiBold,
-  Montserrat_700Bold,
-} from '@expo-google-fonts/montserrat'
 
 const QUICK_TOOLS = [
   {
     key: 'scan',
     title: 'Scan',
     icon: 'camera-outline',
+    href: '/camera',
   },
   {
     key: 'map',
     title: 'Map',
     icon: 'location-outline',
+    href: '/map',
   },
   {
     key: 'reports',
     title: 'My Reports',
     icon: 'time-outline',
+    href: '/profile',
   },
   {
     key: 'notification',
     title: 'Notification',
     icon: 'sparkles-outline',
+    href: '/notification',
   },
 ]
 
@@ -46,34 +45,26 @@ function getFirstName(name) {
 }
 
 
-
 export default function Dashboard() {
   const [greetingName, setGreetingName] = useState('Friend')
 
   const fadeAnim = useRef(new Animated.Value(0)).current
-  const slideAnim = useRef(new Animated.Value(15)).current
+  const slideAnim = useRef(new Animated.Value(10)).current
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 800,
+        duration: 250,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 250,
         useNativeDriver: true,
       }),
     ]).start()
   }, [])
-
-  const [fontsLoaded] = useFonts({
-    Montserrat_400Regular,
-    Montserrat_600SemiBold,
-    Montserrat_700Bold,
-  })
-  
 
   useEffect(() => {
     const loadGreetingName = async () => {
@@ -93,10 +84,6 @@ export default function Dashboard() {
     loadGreetingName()
   }, [])
 
-  if (!fontsLoaded) {
-    return null
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
@@ -106,7 +93,7 @@ export default function Dashboard() {
         >
           <View style={styles.header}>
             <View style={styles.brandWrap}>
-              <Text style={styles.brandText}>Mangrow</Text>
+              <Text style={styles.brandText}>Dashboard</Text>
             </View>
 
             <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85}>
@@ -141,74 +128,131 @@ export default function Dashboard() {
 
             <View style={styles.statCard}>
               <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>HEALTHY</Text>
+              <Text style={styles.statLabel}>RESOLVED</Text>
             </View>
 
             <View style={styles.statCard}>
               <Text style={styles.statValue}>1</Text>
-              <Text style={styles.statLabel}>RESOLVED</Text>
+              <Text style={styles.statLabel}>MY REPORT</Text>
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Quick Tools</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Quick Tools</Text>
+          </View>
 
           <View style={styles.toolsGrid}>
-            {QUICK_TOOLS.map((tool) => (
-              <TouchableOpacity
-                key={tool.key}
-                style={styles.toolCard}
-                activeOpacity={0.88}
-              >
-                <View style={styles.toolIconWrap}>
-                  <Ionicons name={tool.icon} size={22} color="#2C8F2F" />
-                </View>
-                <Text style={styles.toolTitle}>{tool.title}</Text>
-              </TouchableOpacity>
-            ))}
+            {QUICK_TOOLS.map((tool) => {
+              const cardContent = (
+                <>
+                  <View style={styles.toolIconWrap}>
+                    <Ionicons name={tool.icon} size={22} color="#2C8F2F" />
+                  </View>
+                  <Text style={styles.toolTitle}>{tool.title}</Text>
+                </>
+              );
+
+              if (tool.href) {
+                return (
+                  <Link key={tool.key} href={tool.href} asChild>
+                    <TouchableOpacity style={styles.toolCard} activeOpacity={0.88}>
+                      {cardContent}
+                    </TouchableOpacity>
+                  </Link>
+                );
+              }
+
+              return (
+                <TouchableOpacity key={tool.key} style={styles.toolCard} activeOpacity={0.88}>
+                  {cardContent}
+                </TouchableOpacity>
+              );
+            })}
           </View>
+
+          {/* --- Recent Reports Section --- */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Reports</Text>
+            <TouchableOpacity onPress={() => { }}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
+          {[
+            {
+              id: '1',
+              species: 'Rhizophora apiculata',
+              location: 'Manila Bay – North Pier',
+              health: 'Unhealthy',
+              status: 'Active',
+              image: require('../assets/app_logo.png'), // placeholder
+            },
+            {
+              id: '2',
+              species: 'Avicennia marina',
+              location: 'Cavite Coastal Reserve',
+              health: 'Unhealthy',
+              status: 'Active',
+              image: require('../assets/app_logo.png'), // placeholder
+            },
+            {
+              id: '3',
+              species: 'Sonneratia alba',
+              location: 'Las Piñas Wetland',
+              health: 'Unhealthy',
+              status: 'Under Review',
+              image: require('../assets/app_logo.png'), // placeholder
+            },
+          ].map((report) => (
+            <TouchableOpacity
+              key={report.id}
+              style={styles.reportCard}
+              activeOpacity={0.85}
+            >
+              <Image source={report.image} style={styles.reportImage} />
+
+              <View style={styles.reportContent}>
+                <Text style={styles.reportSpecies}>{report.species}</Text>
+                <Text style={styles.reportLocation}>{report.location}</Text>
+
+                <View style={styles.reportFooter}>
+                  <View style={styles.healthRow}>
+                    <View
+                      style={[
+                        styles.healthDot,
+                        { backgroundColor: report.health === 'Healthy' ? '#2DA031' : '#FF4D4F' },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.healthText,
+                        { color: report.health === 'Healthy' ? '#2DA031' : '#FF4D4F' },
+                      ]}
+                    >
+                      {report.health}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      report.status === 'Resolved'
+                        ? styles.resolvedBadge
+                        : report.status === 'Active'
+                          ? styles.activeBadge
+                          : styles.reviewBadge,
+                    ]}
+                  >
+                    <Text style={styles.statusText}>{report.status}</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </Animated.View>
 
-      <View style={styles.bottomNavSafeArea} pointerEvents="none" />
-
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <Feather name="home" size={18} color="#3D5F18" />
-          <Text style={[styles.navText, styles.activeNavText]}>Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <View style={styles.navIconWrap}>
-            <Feather name="file-text" size={18} color="#B8BEB3" />
-            <View style={styles.reportBadge}>
-              <Ionicons name="add" size={8} color="#fff" />
-            </View>
-          </View>
-          <Text style={styles.navText}>Report</Text>
-        </TouchableOpacity>
-
-        <Link href="/camera" asChild>
-          <TouchableOpacity style={styles.cameraWrapper} activeOpacity={0.86}>
-            <View style={styles.cameraBackground}>
-              <View style={styles.cameraButton}>
-                <Ionicons name="camera-outline" size={20} color="#fff" />
-              </View>
-            </View>
-          </TouchableOpacity>
-        </Link>
-
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <View style={styles.navIconWrap}>
-            <Feather name="bell" size={18} color="#B8BEB3" />
-          </View>
-          <Text style={styles.navText}>Alert</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-          <Feather name="user" size={18} color="#B8BEB3" />
-          <Text style={styles.navText}>Profile</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNav activeTab="home" />
     </SafeAreaView>
   )
 }
@@ -223,13 +267,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 18,
     paddingBottom: 14,
-    },
+  },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
 
   brandWrap: {
@@ -247,14 +291,14 @@ const styles = StyleSheet.create({
   settingsBtn: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 15,
     backgroundColor: '#EFF5E8',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   heroCard: {
-    width: '100%',  
+    width: '100%',
     borderRadius: 18,
     backgroundColor: '#CFEFC7',
     overflow: 'hidden',
@@ -263,7 +307,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 14,
+    marginBottom: 20,
   },
 
   heroContent: {
@@ -278,7 +322,7 @@ const styles = StyleSheet.create({
     bottom: -40,
     width: 200,
     height: 170,
-    opacity: 1,
+    opacity: 0.45,
   },
 
   heroEyebrow: {
@@ -328,7 +372,6 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 16,
   },
 
   statCard: {
@@ -358,15 +401,26 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat_600SemiBold',
   },
 
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Montserrat_700Bold',
     lineHeight: 22,
     color: '#10200F',
     letterSpacing: -0.25,
-    marginBottom: 12,
-    marginTop: 12,
-    
+  },
+
+  seeAllText: {
+    fontSize: 14,
+    fontFamily: 'Montserrat_600SemiBold',
+    color: '#34A232',
   },
 
   toolsGrid: {
@@ -388,6 +442,11 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderColor: '#E8ECDD',
     justifyContent: 'space-between',
+    shadowColor: '#A7B195',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
   },
 
   toolIconWrap: {
@@ -411,79 +470,79 @@ const styles = StyleSheet.create({
     maxWidth: 90,
   },
 
-  bottomNav: {
-    position: 'absolute',
-    bottom: 17,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#fff',
+  reportCard: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingHorizontal: 0,
-  
-  },
-
-  bottomNavSafeArea: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 14,
+    alignItems: 'center',
     backgroundColor: '#fff',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E8ECDD',
+    padding: 12,
+    marginBottom: 12,
   },
 
-  navItem: {
-    width: '20%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 38,
+  reportImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
 
-  navIconWrap: {
-    width: 22,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  reportContent: {
+    flex: 1,
+    marginLeft: 12,
   },
 
-  navText: {
-    marginTop: 1,
-    fontSize: 8,
+  reportSpecies: {
+    fontSize: 14,
+    color: '#10200F',
+    fontFamily: 'Montserrat_700Bold',
+  },
+
+  reportLocation: {
+    fontSize: 11,
+    color: '#7B8177',
     fontFamily: 'Montserrat_400Regular',
-    lineHeight: 10,
-    color: '#8E958A',
+    marginTop: 2,
   },
 
-  activeNavText: {
-    color: '#3D5F18',
-  },
-
-  cameraWrapper: {
-    width: '20%',
+  reportFooter: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 42,
-    marginTop: -20,
+    marginTop: 8,
   },
 
-  cameraBackground: {
-    width: 60,
-    height: 60,
-    borderRadius: 29,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+  healthRow: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
 
-  cameraButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 22,
-    backgroundColor: '#3EAA2B',
-    justifyContent: 'center',
-    alignItems: 'center',
+  healthDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+
+  healthText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat_600SemiBold',
+  },
+
+  statusBadge: {
+    marginLeft: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+
+  activeBadge: { backgroundColor: '#FFE7E7' },
+  resolvedBadge: { backgroundColor: '#DDF3D6' },
+  reviewBadge: { backgroundColor: '#FFF2D9' },
+
+  statusText: {
+    fontSize: 10,
+    fontFamily: 'Montserrat_600SemiBold',
+    color: '#10200F',
   },
 
   reportBadge: {

@@ -21,11 +21,16 @@ export default function SpeciesWithGpsCoordinatesResult() {
 
   if (!fontsLoaded) return null
 
-  const readableLocation = [
+  const readableLocationParts = [
+    params.purok,
     params.barangay,
     params.city,
+    params.province,
     params.region,
-  ].filter(Boolean).join(', ')
+  ].filter(Boolean)
+
+  const readableLocation = readableLocationParts.join(', ')
+
 
   const formattedDate = params.timestamp
     ? new Date(params.timestamp).toLocaleString()
@@ -68,8 +73,13 @@ export default function SpeciesWithGpsCoordinatesResult() {
             </View>
             <View style={styles.locationTextColumn}>
               <Text style={styles.locationLabel}>LOCATION</Text>
-              <Text style={styles.locationTitle}>{readableLocation || 'Detecting Location...'}</Text>
-              <Text style={styles.locationSub}>{params.country || 'Unknown Region'}</Text>
+              <Text style={styles.locationTitle}>
+                {readableLocation || 'Location unavailable'}
+              </Text>
+
+              <Text style={styles.locationSub}>
+                {params.country || ''}
+              </Text>
             </View>
           </View>
 
@@ -108,7 +118,13 @@ export default function SpeciesWithGpsCoordinatesResult() {
 
       {/* Fixed Action Button Dock */}
       <View style={styles.buttonDock}>
-        <TouchableOpacity style={styles.primaryButton} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => router.push({
+            pathname: '/health_camera',
+            params: params,
+          })}
+        >
           <Ionicons name="heart-circle-outline" size={22} color="#FFFFFF" />
           <Text style={styles.primaryButtonText}>Check Health Status</Text>
         </TouchableOpacity>
@@ -118,14 +134,14 @@ export default function SpeciesWithGpsCoordinatesResult() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#FBFCF7' 
+  container: {
+    flex: 1,
+    backgroundColor: '#FBFCF7'
   },
-  
-  content: { 
-    padding: 16, 
-    paddingBottom: 30 ,
+
+  content: {
+    padding: 16,
+    paddingBottom: 30,
     paddingTop: 24,
   },
 
@@ -150,75 +166,75 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
-  imageCard: { 
-    borderRadius: 22, 
-    overflow: 'hidden', 
-    backgroundColor: '#FFFFFF', 
-    marginBottom: 16 
-  },
-  
-  image: { 
-    width: '100%', 
-    height: 260 
-  },
-  
-  imagePlaceholder: { 
-    height: 260, 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    backgroundColor: '#F3F4F6' 
+
+  imageCard: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    marginBottom: 16
   },
 
-  card: { 
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 20, 
-    padding: 18, 
-    marginBottom: 16 
+  image: {
+    width: '100%',
+    height: 260
   },
 
-  badge: { 
-    alignSelf: 'flex-start', 
-    backgroundColor: '#CFEFC7', 
-    paddingHorizontal: 10, 
-    paddingVertical: 5, 
-    borderRadius: 12, 
-    marginBottom: 12 
+  imagePlaceholder: {
+    height: 260,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6'
   },
 
-  badgeText: { 
-    fontSize: 11, 
-    color: '#2E8F2C', 
-    fontFamily: 'Montserrat_700Bold' 
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16
   },
-  
-  speciesName: { 
-    fontSize: 30, 
-    lineHeight: 38, 
-    color: '#10200F', 
+
+  badge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#CFEFC7',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    marginBottom: 12
+  },
+
+  badgeText: {
+    fontSize: 11,
+    color: '#2E8F2C',
+    fontFamily: 'Montserrat_700Bold'
+  },
+
+  speciesName: {
+    fontSize: 30,
+    lineHeight: 38,
+    color: '#10200F',
     fontFamily: 'Montserrat_700Bold',
-     marginBottom: 10 
-    },
-
-  description: { 
-    fontSize: 16, 
-    lineHeight: 28, 
-    color: '#4B5563', 
-    fontFamily: 'Montserrat_400Regular' 
+    marginBottom: 10
   },
 
-  disclaimer: { 
-    marginTop: 20, 
-    fontSize: 13, 
-    lineHeight: 20, 
-    color: '#9CA3AF', 
-    fontStyle: 'italic' 
+  description: {
+    fontSize: 16,
+    lineHeight: 28,
+    color: '#4B5563',
+    fontFamily: 'Montserrat_400Regular'
   },
 
-  locationCard: { 
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 20, 
-    padding: 20, 
+  disclaimer: {
+    marginTop: 20,
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#9CA3AF',
+    fontStyle: 'italic'
+  },
+
+  locationCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#E8ECDD',
@@ -230,7 +246,7 @@ const styles = StyleSheet.create({
   },
 
   locationHeaderRow: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
   },
@@ -257,20 +273,20 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
-  locationTitle: { 
-    fontSize: 16, 
-    color: '#10200F', 
-    fontFamily: 'Montserrat_600SemiBold' 
+  locationTitle: {
+    fontSize: 13,
+    color: '#10200F',
+    fontFamily: 'Montserrat_600SemiBold'
   },
 
-  locationSub: { 
-    fontSize: 12, 
-    color: '#6B7280', 
-    fontFamily: 'Montserrat_400Regular' 
+  locationSub: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: 'Montserrat_400Regular'
   },
 
-  infoRow: { 
-    flexDirection: 'row', 
+  infoRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
     gap: 12,
@@ -288,18 +304,26 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
 
-  infoText: { 
-    fontSize: 14, 
-    color: '#4B5563', 
-    fontFamily: 'Montserrat_400Regular' 
+  infoText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#4B5563',
+    fontFamily: 'Montserrat_400Regular',
   },
 
-  divider: { 
-    height: 1, 
-    backgroundColor: '#E5E7EB', 
-    marginVertical: 14 
+  infoText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#4B5563',
+    fontFamily: 'Montserrat_400Regular'
   },
-  
+
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 14
+  },
+
   buttonDock: {
     padding: 16,
     backgroundColor: '#FFFFFF',
@@ -307,19 +331,20 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E7EB',
     paddingBottom: 35,
   },
-  
-  primaryButton: { 
-    height: 60, 
-    borderRadius: 16, 
-    backgroundColor: '#6daa1a', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    flexDirection: 'row' 
+
+  primaryButton: {
+    height: 60,
+    borderRadius: 16,
+    backgroundColor: '#6daa1a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
 
-  primaryButtonText: { 
-    marginLeft: 8, 
-    color: '#FFFFFF', 
-    fontSize: 14, 
-    fontFamily: 'Montserrat_700Bold' },
+  primaryButtonText: {
+    marginLeft: 8,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'Montserrat_700Bold'
+  },
 })

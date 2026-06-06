@@ -21,22 +21,43 @@ import {
 } from '@expo-google-fonts/montserrat'
 
 function mapLocationDetails(address) {
+  const purok =
+    address?.name ||
+    address?.streetNumber ||
+    ''
+
+  const barangay =
+    address?.district ||
+    ''
+
+  const city =
+    address?.city ||
+    ''
+
+  const province =
+    address?.subregion ||
+    ''
+
+  const region =
+    address?.region ||
+    ''
+
   return {
-    street: address?.street || null,
-    purok: address?.name || null,
-    barangay: address?.subregion || address?.district || null,
-    city: address?.city || address?.subregion || null,
-    district: address?.district || null,
-    region: address?.region || null,
-    country: address?.country || null,
-    postalCode: address?.postalCode || null,
+    street: address?.street || '',
+    purok,
+    barangay,
+    city,
+    province,
+    region,
+    country: address?.country || '',
+    postalCode: address?.postalCode || '',
+
     formattedAddress: [
-      address?.street,
-      address?.name,
-      address?.district,
-      address?.subregion,
-      address?.city,
-      address?.region,
+      purok,
+      barangay,
+      city,
+      province,
+      region,
       address?.country,
     ]
       .filter(Boolean)
@@ -187,6 +208,7 @@ const CameraScreen = () => {
           city: locationDetails.city,
           district: locationDetails.district,
           region: locationDetails.region,
+          province: locationDetails.province,
           country: locationDetails.country,
           postalCode: locationDetails.postalCode,
           formattedAddress: locationDetails.formattedAddress,
