@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons, Feather } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
@@ -66,13 +66,26 @@ export default function Profile() {
   const role = (userData?.role || 'volunteer').toUpperCase()
   const avatarInitial = (fullName || 'U').charAt(0).toUpperCase()
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth)
-      router.replace('/Sign_In')
-    } catch (error) {
-      console.error('Error signing out: ', error)
-    }
+  const handleSignOut = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to log out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Logout', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut(auth)
+              router.replace('/Sign_In')
+            } catch (error) {
+              Alert.alert('Error', 'Failed to log out.')
+            }
+          } 
+        },
+      ]
+    )
   }
 
   return (
@@ -83,59 +96,72 @@ export default function Profile() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.brandWrap}>
-            <Text style={styles.headerTitle}>Profile</Text>
+            <Text style={styles.title}>Profile</Text>
           </View>
 
-          <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85} onPress={handleSignOut}>
-            <Feather name="log-out" size={17} color="#304018" />
+          <TouchableOpacity style={styles.backButton} activeOpacity={0.85} onPress={handleSignOut}>
+            <Feather name="log-out" size={20} color="#10200F" />
           </TouchableOpacity>
         </View>
 
         {/* Profile Card */}
         <View style={styles.profileCard}>
-          <View style={styles.profileHeader}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{avatarInitial}</Text>
+          <View style={styles.avatarContainer}>
+            <View style={[styles.avatar, { backgroundColor: '#EFF5E8' }]}>
+              <Text style={styles.avatarInitial}>{avatarInitial}</Text>
             </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.roleText}>{role}</Text>
-              <Text style={styles.nameText}>{fullName}</Text>
-            </View>
+            <TouchableOpacity style={styles.editAvatarBtn}>
+              <Ionicons name="camera" size={16} color="#fff" />
+            </TouchableOpacity>
           </View>
+          
+          <Text style={styles.userName}>{fullName}</Text>
+          <Text style={styles.userRole}>{role}</Text>
+          <View style={styles.emailBadge}>
+            <Text style={styles.userEmail}>{auth.currentUser?.email}</Text>
+          </View>
+        </View>
 
+        {/* Statistics Row (Nested in Profile or Separate) */}
+        <View style={styles.section}>
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>SUBMITTED</Text>
+              <Text style={styles.statLabel}>REPORTS</Text>
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>RESOLVED</Text>
+              <Text style={styles.statLabel}>POINTS</Text>
             </View>
           </View>
         </View>
 
-        {/* Menu List */}
-        <View style={styles.menuCard}>
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="leaf-outline" size={20} color="#6daa1a" />
-            <Text style={styles.menuText}>My Contributions</Text>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="settings-outline" size={20} color="#6daa1a" />
-            <Text style={styles.menuText}>Preferences</Text>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="help-circle-outline" size={20} color="#6daa1a" />
-            <Text style={styles.menuText}>About the Model</Text>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
+        {/* Settings Groups */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>ACCOUNT SETTINGS</Text>
+          <View style={styles.settingsCard}>
+            <SettingRow 
+              icon="person-outline" 
+              label="Edit Profile" 
+              onPress={() => router.push('/edit_profile')}
+            />
+            <SettingRow 
+              icon="lock-closed-outline" 
+              label="Change Password" 
+              onPress={() => router.push('/change_password')}
+            />
+            <SettingRow icon="shield-checkmark-outline" label="Privacy & Security" last />
+          </View>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>SUPPORT & APP</Text>
+          <View style={styles.settingsCard}>
+            <SettingRow icon="settings-outline" label="Preferences" />
+            <SettingRow icon="help-circle-outline" label="About the Model" />
+            <SettingRow icon="information-circle-outline" label="Help Center" last />
+          </View>
+        </View>
 
       </ScrollView>
       </Animated.View>
@@ -145,27 +171,40 @@ export default function Profile() {
   )
 }
 
+const SettingRow = ({ icon, label, last, onPress }) => (
+  <TouchableOpacity style={[styles.row, !last && styles.rowBorder]} onPress={onPress} activeOpacity={0.7}>
+    <View style={styles.rowLeft}>
+      <View style={styles.iconBox}>
+        <Ionicons name={icon} size={20} color="#34A232" />
+      </View>
+      <Text style={styles.rowLabel}>{label}</Text>
+    </View>
+    <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+  </TouchableOpacity>
+)
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FBFCF7' },
-  content: { padding: 16, paddingBottom: 32 },
+  content: { paddingHorizontal: 14, paddingTop: 18, paddingBottom: 140 },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 22,
+    paddingVertical: 16,
+    marginBottom: 16,
   },
   brandWrap: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  headerTitle: {
+  title: {
     fontSize: 22,
     fontFamily: 'Montserrat_700Bold',
     color: '#10200F',
     letterSpacing: -0.3,
   },
-  settingsBtn: {
+  backButton: {
     width: 38,
     height: 38,
     borderRadius: 15,
@@ -175,52 +214,101 @@ const styles = StyleSheet.create({
   },
 
   profileCard: {
-    backgroundColor: '#CFEFC7',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8ECDD',
+    marginBottom: 24,
+    shadowColor: '#A7B195',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
-
-  profileHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 16,
+  },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#A8D19F',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
-  avatarText: { color: '#437105', fontFamily: 'Montserrat_700Bold', fontSize: 18 },
-
-  profileInfo: { flex: 1 },
-  roleText: { color: '#437105', fontSize: 10, fontFamily: 'Montserrat_600SemiBold', marginBottom: 2 },
-  nameText: { color: '#0F1B0F', fontSize: 18, fontFamily: 'Montserrat_700Bold', marginBottom: 2 },
-  subText: { color: '#374151', fontSize: 11, fontFamily: 'Montserrat_400Regular' },
-
-  statsRow: { flexDirection: 'row', marginTop: 12, gap: 12 },
+  avatarInitial: { color: '#437105', fontFamily: 'Montserrat_700Bold', fontSize: 28 },
+  editAvatarBtn: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#34A232',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 3,
+    borderColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userName: {
+    fontSize: 20,
+    color: '#10200F',
+    fontFamily: 'Montserrat_700Bold',
+  },
+  userRole: {
+    fontSize: 13,
+    color: '#7B8177',
+    fontFamily: 'Montserrat_500Medium',
+    marginTop: 4,
+  },
+  emailBadge: {
+    backgroundColor: '#EFF5E8',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+  userEmail: {
+    fontSize: 12,
+    color: '#437105',
+    fontFamily: 'Montserrat_600SemiBold',
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    letterSpacing: 1,
+    color: '#6E756A',
+    fontFamily: 'Montserrat_700Bold',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  statsRow: { flexDirection: 'row', gap: 12 },
   statBox: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E8ECDD',
     paddingVertical: 12,
     alignItems: 'center',
   },
-  statValue: { fontSize: 18, color: '#2DA031', fontFamily: 'Montserrat_700Bold', marginBottom: 2 },
+  statValue: { fontSize: 22, color: '#2DA031', fontFamily: 'Montserrat_700Bold', marginBottom: 2 },
   statLabel: { fontSize: 10, color: '#6E756A', fontFamily: 'Montserrat_600SemiBold' },
 
-  menuCard: { backgroundColor: '#FFFFFF', borderRadius: 20, paddingVertical: 8, marginBottom: 20 },
-
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8ECDD',
+  settingsCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E8ECDD',
+    overflow: 'hidden',
   },
-  menuText: { flex: 1, fontSize: 14, color: '#10200F', fontFamily: 'Montserrat_600SemiBold', marginLeft: 12 },
-
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14 },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: '#F3F5ED' },
+  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBox: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#F7FCF2', justifyContent: 'center', alignItems: 'center' },
+  rowLabel: { fontSize: 14, color: '#10200F', fontFamily: 'Montserrat_500Medium' },
 })

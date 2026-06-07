@@ -276,7 +276,7 @@ const CameraScreen = () => {
               onPress={() => router.replace('/dashboard')}
               activeOpacity={0.8}
             >
-              <Ionicons name="chevron-back" size={24} color="#fff" />
+              <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
 
             <View style={styles.statusPill}>
@@ -389,9 +389,9 @@ const styles = StyleSheet.create({
     
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 34,
+    height: 34,
+    borderRadius: 15,
     backgroundColor: 'rgba(21, 30, 28, 0.72)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -400,6 +400,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
   },
+  
   statusPill: {
     minWidth: 198,
     height: 34,

@@ -20,8 +20,8 @@ export default function RootLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: 'fade',
-        animationDuration: 180,
+        animation: 'none', // Change to 'none' for no animation
+        animationDuration: 0, // Set duration to 0 for no delay
       }}
     >
       <Stack.Screen name="index" />
@@ -32,11 +32,19 @@ export default function RootLayout() {
       <Stack.Screen name="camera" />
       <Stack.Screen name="map" />
       <Stack.Screen name="admin/admin_dashboard" />
+      <Stack.Screen name="admin/admin_notification" />
+      <Stack.Screen name="admin/admin_map" />
+      <Stack.Screen name="admin/admin_verify" />
+      <Stack.Screen name="admin/admin_profile" />
+      <Stack.Screen name="admin/admin_edit_profile" />
+      <Stack.Screen name="admin/admin_change_password" />
       <Stack.Screen name="species_with_gps_coordinates_result" />
       <Stack.Screen name="health_camera" />
       <Stack.Screen name="health_results" />
       <Stack.Screen name="notification" />
       <Stack.Screen name="profile" />
+      <Stack.Screen name="edit_profile" />
+      <Stack.Screen name="change_password" />
     </Stack>
   )
 }

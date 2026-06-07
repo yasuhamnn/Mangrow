@@ -113,9 +113,8 @@ export default function HealthResult() {
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
-            activeOpacity={0.8}
           >
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 30,
-    paddingTop: 24,
+    paddingTop: 80,
   },
   headerOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -153,12 +152,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(21, 30, 28, 0.72)',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(31, 38, 34, 0.82)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.16)',
   },
   card: {
     backgroundColor: '#fff',

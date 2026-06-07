@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import {
@@ -103,19 +103,6 @@ export default function SpeciesWithGpsCoordinatesResult() {
         </View>
       </ScrollView>
 
-      {/* Floating Header Overlay (exactly like camera.jsx) */}
-      <SafeAreaView style={styles.headerOverlay} pointerEvents="box-none">
-        <View style={styles.topOverlay}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="chevron-back" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-
       {/* Fixed Action Button Dock */}
       <View style={styles.buttonDock}>
         <TouchableOpacity
@@ -142,29 +129,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 30,
-    paddingTop: 24,
-  },
-
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-
-  topOverlay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 22,
-    paddingTop: 35,
-    backgroundColor: 'transparent',
-  },
-
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(21, 30, 28, 0.72)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: 80,
   },
 
   imageCard: {

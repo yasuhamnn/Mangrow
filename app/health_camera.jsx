@@ -185,7 +185,7 @@ export default function HealthCamera() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <Ionicons name="chevron-back" size={24} color="#fff" />
+              <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
             <View style={styles.statusPill}>
               <Ionicons name="location-sharp" size={14} color="#55D230" />
@@ -249,17 +249,47 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(21, 30, 28, 0.72)',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(31, 38, 34, 0.82)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.16)',
   },
-  topButtonSpacer: { width: 44, height: 44 },
-  statusPill: { minWidth: 198, height: 34, borderRadius: 17, paddingHorizontal: 13, backgroundColor: 'rgba(31,38,34,0.82)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
-  statusText: { color: '#fff', fontFamily: 'Montserrat_700Bold', fontSize: 12 },
-  guideLayer: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingBottom: 12 },
+  topButtonSpacer: { 
+    width: 34, 
+    height: 34 
+  },
+
+  statusPill: { 
+    minWidth: 198, 
+    height: 34, 
+    borderRadius: 17, 
+    paddingHorizontal: 13, 
+    backgroundColor: 'rgba(31,38,34,0.82)', 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: 5, borderWidth: 1, 
+    borderColor: 'rgba(255,255,255,0.16)' 
+  },
+
+  statusText: { 
+    color: '#fff', 
+    fontFamily: 'Montserrat_700Bold', 
+    fontSize: 12 
+  },
+
+  guideLayer: { 
+    ...StyleSheet.absoluteFillObject, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingHorizontal: 28, 
+    paddingBottom: 12
+   },
+
   frameGuide: {
     width: '95%',
     height: '50%',
@@ -315,8 +345,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  captureButtonDisabled: { opacity: 0.7 },
-  captureInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#3EAA2B', justifyContent: 'center', alignItems: 'center' },
+
+  captureButtonDisabled: { 
+    opacity: 0.7 
+  },
+
+  captureInner: { 
+    width: 56, 
+    height: 56, 
+    borderRadius: 28, 
+    backgroundColor: '#3EAA2B', 
+    justifyContent: 'center', 
+    alignItems: 'center'
+   },
+
   dockHint: {
     marginTop: 18,
     color: '#B8C7E7',
@@ -325,9 +367,38 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     textAlign: 'center',
   },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  permissionContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 28, backgroundColor: '#000' },
-  permissionButton: { backgroundColor: '#6daa1a', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 24, marginTop: 16 },
-  permissionButtonText: { color: '#fff', fontFamily: 'Montserrat_700Bold' },
-  message: { color: '#fff', fontFamily: 'Montserrat_400Regular', fontSize: 14, textAlign: 'center', marginBottom: 20 },
+  centered: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+
+  permissionContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingHorizontal: 28, 
+    backgroundColor: '#000' 
+  },
+
+  permissionButton: { 
+    backgroundColor: '#6daa1a', 
+    paddingHorizontal: 24, 
+    paddingVertical: 12, 
+    borderRadius: 24, 
+    marginTop: 16 
+  },
+
+  permissionButtonText: { 
+    color: '#fff', 
+    fontFamily: 'Montserrat_700Bold' 
+  },
+
+  message: { 
+    color: '#fff', 
+    fontFamily: 'Montserrat_400Regular', 
+    fontSize: 14, 
+    textAlign: 'center', 
+    marginBottom: 20 
+  },
 })
