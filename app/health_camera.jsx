@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: 15,
     backgroundColor: 'rgba(31, 38, 34, 0.82)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   statusPill: { 
     minWidth: 198, 
     height: 34, 
-    borderRadius: 17, 
+    borderRadius: 15, 
     paddingHorizontal: 13, 
     backgroundColor: 'rgba(31,38,34,0.82)', 
     flexDirection: 'row', 

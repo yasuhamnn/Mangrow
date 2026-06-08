@@ -131,7 +131,7 @@ export default function Profile() {
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>POINTS</Text>
+              <Text style={styles.statLabel}>RESOLUTION</Text>
             </View>
           </View>
         </View>
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
     marginBottom: 16,
   },
   brandWrap: {

@@ -19,6 +19,7 @@ import {
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat'
 import AuthBackground from './components/AuthBackground'
+import LoadingOverlay from './components/LoadingOverlay'
 
 const { width } = Dimensions.get('window')
 
@@ -72,6 +73,8 @@ const Forgot_Password = () => {
 
   return (
     <AuthBackground style={styles.container}>
+      <LoadingOverlay visible={isSending} />
+
       <Text style={styles.title}>Welcome to Mangrow</Text>
       <Text style={styles.subtitle}>
         Monitor mangroves, protect coastlines

@@ -45,6 +45,8 @@ export default function RootLayout() {
       <Stack.Screen name="profile" />
       <Stack.Screen name="edit_profile" />
       <Stack.Screen name="change_password" />
+      <Stack.Screen name="search" />
+      <Stack.Screen name="settings" />
     </Stack>
   )
 }

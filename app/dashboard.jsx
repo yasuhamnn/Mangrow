@@ -96,9 +96,11 @@ export default function Dashboard() {
               <Text style={styles.brandText}>Dashboard</Text>
             </View>
 
-            <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85}>
-              <Feather name="settings" size={17} color="#304018" />
-            </TouchableOpacity>
+            <Link href="/settings" asChild>
+              <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.85}>
+                <Feather name="settings" size={17} color="#304018" />
+              </TouchableOpacity>
+            </Link>
           </View>
 
           <View style={styles.heroCard}>
@@ -114,9 +116,11 @@ export default function Dashboard() {
               <Text style={styles.subtitle}>
                 Monitor mangroves, protect coastlines
               </Text>
-              <TouchableOpacity style={styles.submitBtn} activeOpacity={0.88}>
-                <Text style={styles.submitText}>Submit →</Text>
-              </TouchableOpacity>
+              <Link href="/camera" asChild>
+                <TouchableOpacity style={styles.submitBtn} activeOpacity={0.88}>
+                  <Text style={styles.submitText}>Submit →</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           </View>
 
@@ -247,6 +251,8 @@ export default function Dashboard() {
                   </View>
                 </View>
               </View>
+
+              <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
             </TouchableOpacity>
           ))}
         </ScrollView>

@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 import BottomNav from './components/BottomNav'
+import { Feather } from '@expo/vector-icons'
 
 const { height } = Dimensions.get('window')
 
@@ -108,10 +109,36 @@ export default function MapScreen() {
           .leaflet-container {
             background: #f3f7ef;
           }
+          .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #E8ECDD;
+            font-family: sans-serif;
+          }
+          .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #FF4D4F;
+            border-radius: 50%;
+          }
+          .legend-text { font-size: 11px; font-weight: bold; color: #10200F; }
       </style>
   </head>
   <body>
       <div id="map"></div>
+      <div class="legend">
+          <div class="dot"></div>
+          <div class="legend-text">Unhealthy Area</div>
+      </div>
       <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
       <script>
           var map = L.map('map', {zoomControl: true, minZoom: 12, maxZoom: 18, attributionControl: false}).setView([11.0519, 124.0055], 14);
@@ -122,11 +149,13 @@ export default function MapScreen() {
             [11.0555,124.0150]
           ];
           unhealthyAreas.forEach(function(coords) {
-            L.marker(coords, {icon: L.icon({
-              iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-              iconSize: [32,32],
-              iconAnchor: [16,32]
-            })}).addTo(map).bindPopup("Unhealthy Mangrove Area");
+            L.circleMarker(coords, {
+                radius: 8,
+                fillColor: '#FF4D4F',
+                stroke: false,
+                opacity: 1,
+                fillOpacity: 0.9
+            }).addTo(map).bindPopup("Unhealthy Mangrove Area");
           });
       </script>
   </body>
@@ -142,7 +171,14 @@ export default function MapScreen() {
         scrollEventThrottle={16}
       >
         <View style={styles.topSection}>
-          <Text style={styles.header}>Map</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>Map</Text>
+            <Link href="/search" asChild>
+              <TouchableOpacity style={styles.searchBtn} activeOpacity={0.85}>
+                <Feather name="search" size={17} color="#304018" />
+              </TouchableOpacity>
+            </Link>
+          </View>
 
           <View style={styles.mapBox}>
             <WebView
@@ -236,7 +272,26 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FBFCF7' },
   topSection: { paddingHorizontal: 14, paddingTop: 18 },
-  header: { fontSize: 20, fontFamily: 'Montserrat_700Bold', color: '#10200F', marginBottom: 12, letterSpacing: -0.3 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 22,
+    fontFamily: 'Montserrat_700Bold',
+    color: '#10200F',
+    letterSpacing: -0.3,
+  },
+  searchBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 15,
+    backgroundColor: '#EFF5E8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   mapBox: {
     height: height * 0.55,
     borderRadius: 18,

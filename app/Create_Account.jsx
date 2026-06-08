@@ -24,6 +24,7 @@ import {
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat'
 import AuthBackground from './components/AuthBackground'
+import LoadingOverlay from './components/LoadingOverlay'
 
 const { width } = Dimensions.get('window')
 
@@ -36,6 +37,7 @@ const Create_Account = () => {
   const [fullNameFocused, setFullNameFocused] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const [fontsLoaded] = useFonts({
@@ -58,6 +60,7 @@ const Create_Account = () => {
     }
 
     const online = await isOnline()
+    setIsLoading(true)
   
     try {
       if (online) {

@@ -81,7 +81,6 @@ const CameraScreen = () => {
   const [locationPermission, setLocationPermission] = useState(null)
   const [isCapturing, setIsCapturing] = useState(false)
   const [flash, setFlash] = useState('off')
-  const [coords, setCoords] = useState(null)
   const cameraRef = useRef(null)
   const router = useRouter()
 
@@ -92,30 +91,11 @@ const CameraScreen = () => {
   })
 
   useEffect(() => {
-    let subscription
     ;(async () => {
       const { status } = await Location.requestForegroundPermissionsAsync()
       const granted = status === 'granted'
       setLocationPermission(granted)
-
-      if (granted) {
-        // Start watching position to display live coordinates
-        subscription = await Location.watchPositionAsync(
-          {
-            accuracy: Location.Accuracy.Balanced,
-            timeInterval: 3000,
-            distanceInterval: 5,
-          },
-          (location) => {
-            setCoords(location.coords)
-          }
-        )
-      }
     })()
-
-    return () => {
-      if (subscription) subscription.remove()
-    }
   }, [])
 
   if (!fontsLoaded || !permission) {
@@ -279,15 +259,6 @@ const CameraScreen = () => {
               <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
 
-            <View style={styles.statusPill}>
-              <Ionicons name="location-sharp" size={14} color="#55D230" />
-              <Text style={styles.statusText}>
-                {coords 
-                  ? `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}` 
-                  : 'Detecting GPS...'}
-              </Text>
-            </View>
-
             <View style={styles.topButtonSpacer} />
           </View>
 
@@ -404,7 +375,7 @@ const styles = StyleSheet.create({
   statusPill: {
     minWidth: 198,
     height: 34,
-    borderRadius: 17,
+    borderRadius: 15,
     paddingHorizontal: 13,
     backgroundColor: 'rgba(31, 38, 34, 0.82)',
     borderWidth: 1,

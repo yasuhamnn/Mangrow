@@ -94,12 +94,6 @@ export default function HealthResult() {
             <Text style={styles.summaryValue}>{readableLocation || params.formattedAddress || 'N/A'}</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>GPS:</Text>
-            <Text style={styles.summaryValue}>
-              {params.latitude || '0.000000'}, {params.longitude || '0.000000'}
-            </Text>
-          </View>
-          <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Date:</Text>
             <Text style={styles.summaryValue}>{formattedDate}</Text>
           </View>
@@ -114,7 +108,7 @@ export default function HealthResult() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={20} color="#fff" />
+            <Ionicons name="arrow-back" size={20} color="#304018" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -154,8 +148,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 34,
     height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(31, 38, 34, 0.82)',
+    borderRadius: 15,
+    backgroundColor: 'rgba(239, 245, 232, 1)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,

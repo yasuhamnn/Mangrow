@@ -23,6 +23,7 @@ import {
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat'
 import AuthBackground from './components/AuthBackground'
+import LoadingOverlay from './components/LoadingOverlay'
 
 const { width } = Dimensions.get('window')
 
@@ -34,6 +35,7 @@ const Sign_In = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const [fontsLoaded] = useFonts({
@@ -49,6 +51,7 @@ const Sign_In = () => {
 
   const handleLogin = async () => {
     setErrorMessage('')
+    setIsLoading(true)
   
     const online = await isOnline()
   
@@ -109,10 +112,14 @@ const Sign_In = () => {
       } else {
         setErrorMessage(error?.message ?? 'Unable to sign in.')
       }
+    } finally {
+      setIsLoading(false)
     }
   }
   return (
     <AuthBackground style={styles.container}>
+      <LoadingOverlay visible={isLoading} />
+
       <Text style={styles.title}>Welcome to Mangrow</Text>
       <Text style={styles.subtitle}>Monitor mangroves, protect coastlines</Text>
 

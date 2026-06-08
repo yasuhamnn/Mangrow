@@ -21,21 +21,6 @@ export default function SpeciesWithGpsCoordinatesResult() {
 
   if (!fontsLoaded) return null
 
-  const readableLocationParts = [
-    params.purok,
-    params.barangay,
-    params.city,
-    params.province,
-    params.region,
-  ].filter(Boolean)
-
-  const readableLocation = readableLocationParts.join(', ')
-
-
-  const formattedDate = params.timestamp
-    ? new Date(params.timestamp).toLocaleString()
-    : 'Unknown Date'
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -63,43 +48,6 @@ export default function SpeciesWithGpsCoordinatesResult() {
           <Text style={styles.disclaimer}>
             Species identification will appear here once the AI model is implemented.
           </Text>
-        </View>
-
-        {/* Location & GPS */}
-        <View style={styles.locationCard}>
-          <View style={styles.locationHeaderRow}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="location" size={20} color="#6daa1a" />
-            </View>
-            <View style={styles.locationTextColumn}>
-              <Text style={styles.locationLabel}>LOCATION</Text>
-              <Text style={styles.locationTitle}>
-                {readableLocation || 'Location unavailable'}
-              </Text>
-
-              <Text style={styles.locationSub}>
-                {params.country || ''}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.infoRow}>
-            <Ionicons name="navigate-circle" size={20} color="#6daa1a" />
-            <View style={styles.textContainer}>
-              <Text style={styles.miniLabel}>GPS COORDINATES</Text>
-              <Text style={styles.infoText}>{params.latitude || '0.000000'}, {params.longitude || '0.000000'}</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={20} color="#6daa1a" />
-            <View style={styles.textContainer}>
-              <Text style={styles.miniLabel}>CAPTURE TIMESTAMP</Text>
-              <Text style={styles.infoText}>{formattedDate}</Text>
-            </View>
-          </View>
         </View>
       </ScrollView>
 

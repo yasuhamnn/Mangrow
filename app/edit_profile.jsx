@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { auth, db } from '../firebaseConfig'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import LoadingOverlay from './components/LoadingOverlay'
 
 export default function EditProfile() {
   const router = useRouter();
@@ -73,6 +74,8 @@ export default function EditProfile() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <LoadingOverlay visible={loading} />
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Edit Profile</Text>
